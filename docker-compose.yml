@@ -1,8 +1,8 @@
 services:
   stats-server:
     build:
-      context: .
-      dockerfile: stats-service/stats-server/Dockerfile
+      context: stats/stats-server
+      dockerfile: Dockerfile
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/ewm_stats
       SPRING_DATASOURCE_USERNAME: stats
