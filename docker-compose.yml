@@ -13,10 +13,10 @@ services:
     volumes:
       - stats-db-data:/var/lib/postgresql/data
 
-stats-server:
-  build:
-    context: stats/stats-server
-    dockerfile: Dockerfile
+  stats-server:
+    build:
+      context: stats/stats-server
+      dockerfile: Dockerfile
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/ewm_stats
       SPRING_DATASOURCE_USERNAME: stats
