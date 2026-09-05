@@ -1,7 +1,6 @@
 services:
   stats-db:
     image: postgres:16.1-alpine
-    container_name: stats-db
     environment:
       POSTGRES_DB: ewm_stats
       POSTGRES_USER: stats
@@ -13,12 +12,11 @@ services:
       retries: 10
     volumes:
       - stats-db-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   stats-server:
-    build: stats/stats-server
-    container_name: stats-server
+    build:
+      context: .
+      dockerfile: stats/stats-server/Dockerfile
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/ewm_stats
       SPRING_DATASOURCE_USERNAME: stats
@@ -30,10 +28,11 @@ services:
         condition: service_healthy
 
   ewm-service:
-    build: ewm-service
+    image: alpine:latest
     container_name: ewm-service
     ports:
       - "8080:8080"
+    command: ["sh", "-c", "echo 'ewm-service placeholder running' && tail -f /dev/null"]
     depends_on:
       - stats-server
 
