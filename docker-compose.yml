@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: stats
       POSTGRES_PASSWORD: stats
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U stats -d ewm_stats" ]
+      test: ["CMD-SHELL", "pg_isready -U stats -d ewm_stats"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -32,7 +32,9 @@ services:
     container_name: ewm-service
     ports:
       - "8080:8080"
-    command: [ "sh", "-c", "echo 'ewm-service placeholder running' && tail -f /dev/null" ]
+    command: ["sh", "-c", "echo 'ewm-service placeholder running' && tail -f /dev/null"]
+    depends_on:
+      - stats-server
 
 volumes:
   stats-db-data:
