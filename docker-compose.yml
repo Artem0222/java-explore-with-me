@@ -1,14 +1,40 @@
 services:
+  stats-db:
+    image: postgres:16.1-alpine
+    environment:
+      POSTGRES_DB: ewm_stats
+      POSTGRES_USER: stats
+      POSTGRES_PASSWORD: stats
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stats -d ewm_stats"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+
   stats-server:
+    build:
+      context: stats/stats-server
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/ewm_stats
+      SPRING_DATASOURCE_USERNAME: stats
+      SPRING_DATASOURCE_PASSWORD: stats
     ports:
       - "9090:9090"
-
-  stats-db:
-    image: postgres:16.1
+    depends_on:
+      stats-db:
+        condition: service_healthy
 
   ewm-service:
+    image: alpine:latest
+    container_name: ewm-service
     ports:
       - "8080:8080"
+    command: ["sh", "-c", "echo 'ewm-service placeholder running' && tail -f /dev/null"]
+    depends_on:
+      - stats-server
 
-  ewm-db:
-    image: postgres:16.1
+volumes:
+  stats-db-data:
