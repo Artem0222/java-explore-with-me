@@ -29,7 +29,6 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         if (Boolean.TRUE.equals(unique)) {
             return statsRepository.findStatsWithUniqueIp(start, end, uris);

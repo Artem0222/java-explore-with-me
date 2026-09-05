@@ -1,8 +1,10 @@
 package ru.practicum.stats.server.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.stats.dto.EndpointHit;
 import ru.practicum.stats.server.model.Hit;
 
+@UtilityClass
 public class HitMapper {
 
     public static Hit toEntity(EndpointHit endpointHit) {
