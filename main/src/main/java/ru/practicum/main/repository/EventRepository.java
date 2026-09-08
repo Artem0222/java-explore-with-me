@@ -36,4 +36,23 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             @Param("rangeEnd") LocalDateTime rangeEnd,
             Pageable pageable
     );
+
+    boolean existsByCategoryId(Long categoryId);
+
+    @Query("""
+        SELECT e FROM Event e
+        WHERE (:users IS NULL OR e.initiator.id IN :users)
+        AND (:states IS NULL OR e.state IN :states)
+        AND (:categories IS NULL OR e.category.id IN :categories)
+        AND e.eventDate >= :rangeStart
+        AND e.eventDate <= :rangeEnd
+        """)
+    List<Event> findAllAdminEvents(
+            @Param("users") List<Long> users,
+            @Param("states") List<String> states,
+            @Param("categories") List<Long> categories,
+            @Param("rangeStart") LocalDateTime rangeStart,
+            @Param("rangeEnd") LocalDateTime rangeEnd,
+            Pageable pageable
+    );
 }
