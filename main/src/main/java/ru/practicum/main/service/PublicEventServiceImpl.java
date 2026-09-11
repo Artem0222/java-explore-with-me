@@ -21,7 +21,6 @@ import ru.practicum.main.util.PageRequestUtil;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +45,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                 text, categories, paid, rangeStart, rangeEnd, pageable
         );
 
-        statsClient.saveHit(ru.practicum.stats.dto.EndpointHit.builder()
+        statsClient.saveHit(ru.practicum.main.stats.dto.EndpointHit.builder()
                 .app("ewm-main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
@@ -77,7 +76,7 @@ public class PublicEventServiceImpl implements PublicEventService {
         Event event = eventRepository.findByIdAndState(id, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + id + " was not found"));
 
-        statsClient.saveHit(ru.practicum.stats.dto.EndpointHit.builder()
+        statsClient.saveHit(ru.practicum.main.stats.dto.EndpointHit.builder()
                 .app("ewm-main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
@@ -103,11 +102,10 @@ public class PublicEventServiceImpl implements PublicEventService {
     private void fillViewsForEvents(List<EventShortDto> events) {
         if (events.isEmpty()) {
             return;
-            ;
         }
 
         List<String> uris = events.stream()
-                .map(e -> "/events" + e.getId())
+                .map(e -> "/events/" + e.getId())
                 .collect(Collectors.toList());
 
         LocalDateTime start = LocalDateTime.now().minusYears(10);
@@ -115,17 +113,11 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         var statsResponse = statsClient.getStats(start, end, uris, false);
         if (statsResponse.getBody() != null) {
-            Map<String, Long> viewsMap = Map.of();
-            try {
-                viewsMap = Map.of();
-                for (ViewStats stat : statsResponse.getBody()) {
-                    if (viewsMap instanceof java.util.HashMap) {
-                        ((java.util.HashMap<String, Long>) viewsMap).put(stat.getUri(), stat.getHits());
-                    }
-                }
-            } catch (Exception e) {
-                log.warn("Could not parse stats response: {}", e.getMessage());
+            java.util.Map<String, Long> viewsMap = new java.util.HashMap<>();
+            for (ViewStats stat : statsResponse.getBody()) {
+                viewsMap.put(stat.getUri(), stat.getHits());
             }
+
             for (EventShortDto dto : events) {
                 String uri = "/events/" + dto.getId();
                 dto.setViews(viewsMap.getOrDefault(uri, 0L));
