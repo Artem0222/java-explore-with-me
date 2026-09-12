@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.main.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.main.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.main.dto.request.ParticipationRequestDto;
+import ru.practicum.main.exception.BadRequestException;
 import ru.practicum.main.service.PrivateRequestService;
 
 import java.util.List;
@@ -57,8 +58,11 @@ public class PrivateRequestController {
     public EventRequestStatusUpdateResult updateRequestStatus(
             @PathVariable Long userId,
             @PathVariable Long eventId,
-            @Valid @RequestBody EventRequestStatusUpdateRequest updateRequest
+            @RequestBody(required = false) EventRequestStatusUpdateRequest updateRequest
     ) {
+        if (updateRequest == null) {
+            throw new BadRequestException("Request body is missing");
+        }
         log.info("PATCH /users/{}/events/{}/requests: {}", userId, eventId, updateRequest);
         return privateRequestService.updateRequestStatus(userId, eventId, updateRequest);
     }

@@ -1,9 +1,6 @@
 package ru.practicum.main.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import ru.practicum.main.dto.event.EventFullDto;
 import ru.practicum.main.dto.event.EventShortDto;
 import ru.practicum.main.dto.event.NewEventDto;
@@ -14,7 +11,9 @@ import ru.practicum.main.model.Event;
 import ru.practicum.main.model.Location;
 import ru.practicum.main.model.User;
 
-@Mapper(componentModel = "spring", uses = {CategoryMapper.class, UserMapper.class, LocationMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {CategoryMapper.class, UserMapper.class, LocationMapper.class},
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface EventMapper {
 
     @Mapping(target = "category", source = "category")
@@ -39,6 +38,7 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     Event toEntity(NewEventDto newEventDto, Long userId, Long categoryId);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
@@ -50,6 +50,7 @@ public interface EventMapper {
     @Mapping(target = "location", source = "location", qualifiedByName = "locationFromDto")
     void updateEntityFromUserRequest(UpdateEventUserRequest request, @MappingTarget Event event);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
