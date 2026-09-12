@@ -35,7 +35,11 @@ public class PublicEventServiceImpl implements PublicEventService {
     private final StatsClient statsClient;
 
     @Override
-    public List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, int from, int size, HttpServletRequest request) {
+    public List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid,
+                                         LocalDateTime rangeStart, LocalDateTime rangeEnd,
+                                         Boolean onlyAvailable, String sort, int from, int size,
+                                         HttpServletRequest request) {
+
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
             throw new BadRequestException("Range start must be before range end");
         }
@@ -44,8 +48,9 @@ public class PublicEventServiceImpl implements PublicEventService {
             rangeStart = LocalDateTime.now();
         }
         if (rangeEnd == null) {
-            rangeEnd = LocalDateTime.now().plusYears(100);
+            rangeEnd = LocalDateTime.now().plusYears(100);   // <-- ДОБАВИЛ
         }
+
         Pageable pageable = PageRequestUtil.of(from, size);
 
         List<Event> events = eventRepository.findAllPublishedEvents(
