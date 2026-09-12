@@ -5,6 +5,7 @@ services:
       POSTGRES_DB: ewm_stats
       POSTGRES_USER: stats
       POSTGRES_PASSWORD: stats
+      TZ: UTC
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U stats -d ewm_stats"]
       interval: 5s
@@ -33,6 +34,7 @@ services:
       POSTGRES_DB: ewm_main
       POSTGRES_USER: ewm
       POSTGRES_PASSWORD: ewm
+      TZ: UTC
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ewm -d ewm_main"]
       interval: 5s
