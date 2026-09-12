@@ -1,7 +1,6 @@
 services:
   stats-db:
     image: postgres:16.1-alpine
-    container_name: stats-db
     environment:
       POSTGRES_DB: ewm_stats
       POSTGRES_USER: stats
@@ -20,7 +19,6 @@ services:
     build:
       context: stats/stats-server
       dockerfile: Dockerfile
-    container_name: stats-server
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/ewm_stats
       SPRING_DATASOURCE_USERNAME: stats
@@ -33,13 +31,12 @@ services:
 
   main-db:
     image: postgres:16.1-alpine
-    container_name: main-db
     environment:
       POSTGRES_DB: ewm_main
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ewm
+      POSTGRES_PASSWORD: ewm
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ewm_main"]
+      test: ["CMD-SHELL", "pg_isready -U ewm -d ewm_main"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -52,11 +49,10 @@ services:
     build:
       context: main
       dockerfile: Dockerfile
-    container_name: ewm-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://main-db:5432/ewm_main
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_USERNAME: ewm
+      SPRING_DATASOURCE_PASSWORD: ewm
       STATS_SERVER_URL: http://stats-server:9090
     ports:
       - "8080:8080"
