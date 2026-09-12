@@ -2,6 +2,7 @@ package ru.practicum.main.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.dto.event.EventFullDto;
@@ -13,7 +14,6 @@ import ru.practicum.main.mapper.EventMapper;
 import ru.practicum.main.model.Event;
 import ru.practicum.main.model.EventState;
 import ru.practicum.main.repository.EventRepository;
-import ru.practicum.main.util.PageRequestUtil;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
@@ -40,7 +40,10 @@ public class AdminEventServiceImpl implements AdminEventService {
             int from,
             int size
     ) {
-        Pageable pageable = PageRequestUtil.of(from, size);
+        if (size <= 0) {
+            size = 10;
+        }
+        Pageable pageable = PageRequest.of(from / size, size);
 
         if (rangeStart == null) {
             rangeStart = LocalDateTime.now().minusYears(100);

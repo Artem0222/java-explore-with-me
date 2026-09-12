@@ -2,6 +2,7 @@ package ru.practicum.main.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.dto.event.EventFullDto;
@@ -17,7 +18,6 @@ import ru.practicum.main.repository.CategoryRepository;
 import ru.practicum.main.repository.EventRepository;
 import ru.practicum.main.repository.LocationRepository;
 import ru.practicum.main.repository.UserRepository;
-import ru.practicum.main.util.PageRequestUtil;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
@@ -41,7 +41,10 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     public List<EventShortDto> getUserEvents(Long userId, int from, int size) {
         User user = getUserOrThrow(userId);
 
-        Pageable pageable = PageRequestUtil.of(from, size);
+        if (size <= 0) {
+            size = 10;
+        }
+        Pageable pageable = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageable).getContent();
 
         log.info("Найдены {} ивенты для пользователя {}", events.size(), userId);

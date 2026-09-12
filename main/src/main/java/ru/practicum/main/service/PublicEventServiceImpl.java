@@ -102,10 +102,11 @@ public class PublicEventServiceImpl implements PublicEventService {
             LocalDateTime start = LocalDateTime.now().minusYears(10);
             LocalDateTime end = LocalDateTime.now().plusYears(10);
             var statsResponse = statsClient.getStats(start, end, uris, true);
-            if (statsResponse.getBody() != null && statsResponse.getBody().length > 0) {
+            if (statsResponse != null && statsResponse.getBody() != null && statsResponse.getBody().length > 0) {
                 dto.setViews(statsResponse.getBody()[0].getHits());
             } else {
                 dto.setViews(0L);
+
             }
         } catch (Exception e) {
             log.warn("Ошибка получения статистики: {}", e.getMessage());
