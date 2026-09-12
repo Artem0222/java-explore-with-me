@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.dto.event.EventFullDto;
 import ru.practicum.main.dto.event.UpdateEventAdminRequest;
+import ru.practicum.main.exception.BadRequestException;
 import ru.practicum.main.exception.ConflictException;
 import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.mapper.EventMapper;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class AdminEventServiceImpl implements AdminEventService  {
+public class AdminEventServiceImpl implements AdminEventService {
 
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
@@ -61,12 +62,12 @@ public class AdminEventServiceImpl implements AdminEventService  {
     @Override
     public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest updateRequest) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(()-> new NotFoundException("Ивент с ид=" + eventId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Ивент с ид=" + eventId + " не найден"));
 
         if (updateRequest.getEventDate() != null) {
             LocalDateTime now = LocalDateTime.now();
             if (updateRequest.getEventDate().isBefore(now.plusHours(1))) {
-                throw new ConflictException("Дата ивента долдна быть на час позже текущго помента");
+                throw new BadRequestException("Дата ивента долдна быть на час позже текущго помента");
             }
         }
         if (updateRequest.getStateAction() != null) {
@@ -75,7 +76,7 @@ public class AdminEventServiceImpl implements AdminEventService  {
                     if (event.getState() != EventState.PENDING) {
                         throw new ConflictException("Нельзя публиковать ивенты в неверном статусе: " + event.getState());
                     }
-                    event.setState(EventState.PUBLISHED );
+                    event.setState(EventState.PUBLISHED);
                     event.setPublishedOn(LocalDateTime.now());
                     break;
                 case REJECT_EVENT:

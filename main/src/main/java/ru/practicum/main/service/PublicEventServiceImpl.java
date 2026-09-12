@@ -43,6 +43,9 @@ public class PublicEventServiceImpl implements PublicEventService {
         if (rangeStart == null) {
             rangeStart = LocalDateTime.now();
         }
+        if (rangeEnd == null) {
+            rangeEnd = LocalDateTime.now().plusYears(100);
+        }
         Pageable pageable = PageRequestUtil.of(from, size);
 
         List<Event> events = eventRepository.findAllPublishedEvents(
