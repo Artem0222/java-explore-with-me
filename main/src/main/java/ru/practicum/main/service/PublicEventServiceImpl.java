@@ -48,7 +48,7 @@ public class PublicEventServiceImpl implements PublicEventService {
             rangeStart = LocalDateTime.now();
         }
         if (rangeEnd == null) {
-            rangeEnd = LocalDateTime.now().plusYears(100);   // <-- ДОБАВИЛ
+            rangeEnd = LocalDateTime.now().plusYears(100);
         }
 
         Pageable pageable = PageRequestUtil.of(from, size);
