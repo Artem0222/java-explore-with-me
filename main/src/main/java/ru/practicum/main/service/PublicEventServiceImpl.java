@@ -50,7 +50,7 @@ public class PublicEventServiceImpl implements PublicEventService {
         if (rangeEnd == null) {
             rangeEnd = LocalDateTime.now().plusYears(100);
         }
-
+        if (size <= 0) size = 10;
         Pageable pageable = PageRequestUtil.of(from, size);
 
         List<Event> events = eventRepository.findAllPublishedEvents(
@@ -101,7 +101,7 @@ public class PublicEventServiceImpl implements PublicEventService {
             List<String> uris = List.of("/events/" + id);
             LocalDateTime start = LocalDateTime.now().minusYears(10);
             LocalDateTime end = LocalDateTime.now().plusYears(10);
-            var statsResponse = statsClient.getStats(start, end, uris, false);
+            var statsResponse = statsClient.getStats(start, end, uris, true);
             if (statsResponse.getBody() != null && statsResponse.getBody().length > 0) {
                 dto.setViews(statsResponse.getBody()[0].getHits());
             } else {
@@ -129,7 +129,7 @@ public class PublicEventServiceImpl implements PublicEventService {
             LocalDateTime start = LocalDateTime.now().minusYears(10);
             LocalDateTime end = LocalDateTime.now().plusYears(10);
 
-            var statsResponse = statsClient.getStats(start, end, uris, false);
+            var statsResponse = statsClient.getStats(start, end, uris, true);
             if (statsResponse.getBody() != null) {
                 java.util.Map<String, Long> viewsMap = new java.util.HashMap<>();
                 for (ViewStats stat : statsResponse.getBody()) {
