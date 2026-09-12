@@ -1,6 +1,7 @@
 services:
   stats-db:
     image: postgres:16.1-alpine
+    container_name: stats-db
     environment:
       POSTGRES_DB: ewm_stats
       POSTGRES_USER: stats
@@ -16,7 +17,10 @@ services:
       - "5432:5432"
 
   stats-server:
-    build: stats/stats-server
+    build:
+      context: stats/stats-server
+      dockerfile: Dockerfile
+    container_name: stats-server
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/ewm_stats
       SPRING_DATASOURCE_USERNAME: stats
@@ -29,6 +33,7 @@ services:
 
   main-db:
     image: postgres:16.1-alpine
+    container_name: main-db
     environment:
       POSTGRES_DB: ewm_main
       POSTGRES_USER: postgres
@@ -44,7 +49,10 @@ services:
       - "5433:5432"
 
   ewm-service:
-    build: main
+    build:
+      context: main
+      dockerfile: Dockerfile
+    container_name: ewm-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://main-db:5432/ewm_main
       SPRING_DATASOURCE_USERNAME: postgres
