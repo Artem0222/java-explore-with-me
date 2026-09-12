@@ -16,6 +16,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class StatsServiceImpl implements StatsService {
 
     private final StatsRepository statsRepository;
@@ -30,6 +31,16 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        log.info("Get stats request: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
+
+        if (start != null && end != null && start.isAfter(end)) {
+            throw new IllegalArgumentException("Start date cannot be after end date");
+        }
+
+        if (uris != null && uris.isEmpty()) {
+            uris = null;
+        }
+
         if (Boolean.TRUE.equals(unique)) {
             return statsRepository.findStatsWithUniqueIp(start, end, uris);
         } else {
