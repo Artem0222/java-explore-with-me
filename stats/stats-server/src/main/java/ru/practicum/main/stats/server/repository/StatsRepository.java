@@ -15,7 +15,7 @@ public interface StatsRepository extends JpaRepository<Hit, Long> {
             SELECT h.app AS app, h.uri AS uri, COUNT(h.ip) AS hits
             FROM hits h
             WHERE h.timestamp BETWEEN :start AND :end
-            AND (:uris IS NULL OR h.uri IN (:uris))
+            AND (CAST(:uris AS text[]) IS NULL OR h.uri = ANY(CAST(:uris AS text[])))
             GROUP BY h.app, h.uri
             ORDER BY COUNT(h.ip) DESC
             """)
@@ -29,7 +29,7 @@ public interface StatsRepository extends JpaRepository<Hit, Long> {
             SELECT h.app AS app, h.uri AS uri, COUNT(DISTINCT h.ip) AS hits
             FROM hits h
             WHERE h.timestamp BETWEEN :start AND :end
-            AND (:uris IS NULL OR h.uri IN (:uris))
+            AND (CAST(:uris AS text[]) IS NULL OR h.uri = ANY(CAST(:uris AS text[])))
             GROUP BY h.app, h.uri
             ORDER BY COUNT(DISTINCT h.ip) DESC
             """)
