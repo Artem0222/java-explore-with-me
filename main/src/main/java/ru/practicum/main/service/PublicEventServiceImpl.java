@@ -113,25 +113,30 @@ public class PublicEventServiceImpl implements PublicEventService {
             return;
         }
 
-        List<String> uris = events.stream()
-                .map(e -> "/events/" + e.getId())
-                .collect(Collectors.toList());
+        try {
+            List<String> uris = events.stream()
+                    .map(e -> "/events/" + e.getId())
+                    .collect(Collectors.toList());
 
-        LocalDateTime start = LocalDateTime.now().minusYears(10);
-        LocalDateTime end = LocalDateTime.now().plusYears(10);
+            LocalDateTime start = LocalDateTime.now().minusYears(10);
+            LocalDateTime end = LocalDateTime.now().plusYears(10);
 
-        var statsResponse = statsClient.getStats(start, end, uris, false);
-        if (statsResponse.getBody() != null) {
-            java.util.Map<String, Long> viewsMap = new java.util.HashMap<>();
-            for (ViewStats stat : statsResponse.getBody()) {
-                viewsMap.put(stat.getUri(), stat.getHits());
+            var statsResponse = statsClient.getStats(start, end, uris, false);
+            if (statsResponse.getBody() != null) {
+                java.util.Map<String, Long> viewsMap = new java.util.HashMap<>();
+                for (ViewStats stat : statsResponse.getBody()) {
+                    viewsMap.put(stat.getUri(), stat.getHits());
+                }
+
+                for (EventShortDto dto : events) {
+                    String uri = "/events/" + dto.getId();
+                    dto.setViews(viewsMap.getOrDefault(uri, 0L));
+                }
+            } else {
+                events.forEach(dto -> dto.setViews(0L));
             }
-
-            for (EventShortDto dto : events) {
-                String uri = "/events/" + dto.getId();
-                dto.setViews(viewsMap.getOrDefault(uri, 0L));
-            }
-        } else {
+        } catch (Exception e) {
+            log.warn("Ошибка получения статистики: {}", e.getMessage());
             events.forEach(dto -> dto.setViews(0L));
         }
     }

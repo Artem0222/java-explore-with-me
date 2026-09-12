@@ -116,14 +116,14 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             throw new NotFoundException("Ивент с ид=" + eventId + " не найден для пользоавтеля " + userId);
         }
 
-        if (event.getState() == EventState.PUBLISHED) {
-            throw new ConflictException("Только ивенты в ожидании или отменённые могут быть изменены");
-        }
         if (updateRequest.getEventDate() != null) {
             if (updateRequest.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
                 throw new BadRequestException("Дата события должна быть не ранее чем через 2 часа от текущего момента");
 
             }
+        }
+        if (event.getState() == EventState.PUBLISHED) {
+            throw new ConflictException("Только ивенты в ожидании или отменённые могут быть изменены");
         }
 
         if (updateRequest.getStateAction() != null) {
