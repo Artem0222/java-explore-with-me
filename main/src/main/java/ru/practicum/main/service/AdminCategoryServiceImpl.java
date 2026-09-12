@@ -43,7 +43,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
             throw new ConflictException("категория с названием " + categoryDto.getName() + " уже существует");
         }
 
-        category.setName(category.getName());
+        category.setName(categoryDto.getName());
         category = categoryRepository.save(category);
         log.info("updated category: {}", category);
         return categoryMapper.toDto(category);

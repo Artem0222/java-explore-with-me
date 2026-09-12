@@ -36,11 +36,12 @@ public class PublicEventServiceImpl implements PublicEventService {
 
     @Override
     public List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, int from, int size, HttpServletRequest request) {
-        if (rangeStart == null) {
-            rangeStart = LocalDateTime.now();
-        }
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
             throw new BadRequestException("Range start must be before range end");
+        }
+
+        if (rangeStart == null) {
+            rangeStart = LocalDateTime.now();
         }
         Pageable pageable = PageRequestUtil.of(from, size);
 
@@ -88,17 +89,22 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         EventFullDto dto = eventMapper.toFullDto(event);
 
-        List<String> uris = List.of("/events/" + id);
-        LocalDateTime start = LocalDateTime.now().minusYears(10);
-        LocalDateTime end = LocalDateTime.now().plusYears(10);
-        var statsResponse = statsClient.getStats(start, end, uris, false);
-        if (statsResponse.getBody() != null && statsResponse.getBody().length > 0) {
-            dto.setViews(statsResponse.getBody()[0].getHits());
-        } else {
+        try {
+            List<String> uris = List.of("/events/" + id);
+            LocalDateTime start = LocalDateTime.now().minusYears(10);
+            LocalDateTime end = LocalDateTime.now().plusYears(10);
+            var statsResponse = statsClient.getStats(start, end, uris, false);
+            if (statsResponse.getBody() != null && statsResponse.getBody().length > 0) {
+                dto.setViews(statsResponse.getBody()[0].getHits());
+            } else {
+                dto.setViews(0L);
+            }
+        } catch (Exception e) {
+            log.warn("Ошибка получения статистики: {}", e.getMessage());
             dto.setViews(0L);
         }
 
-        log.info("Returning event: ", dto);
+        log.info("Returning event: {}", dto);
         return dto;
     }
 
