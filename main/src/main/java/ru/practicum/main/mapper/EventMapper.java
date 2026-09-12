@@ -31,7 +31,7 @@ public interface EventMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryFromId")
     @Mapping(target = "initiator", source = "userId", qualifiedByName = "userFromId")
-    @Mapping(target = "location", source = "newEventDto.location")
+    @Mapping(target = "location", source = "newEventDto.location", qualifiedByName = "locationFromDto")
     @Mapping(target = "state", constant = "PENDING")
     @Mapping(target = "createdOn", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "confirmedRequests", constant = "0L")
@@ -46,6 +46,8 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "category", source = "category", qualifiedByName = "categoryFromId")
+    @Mapping(target = "location", source = "location", qualifiedByName = "locationFromDto")
     void updateEntityFromUserRequest(UpdateEventUserRequest request, @MappingTarget Event event);
 
     @Mapping(target = "id", ignore = true)
@@ -55,20 +57,31 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "category", source = "category", qualifiedByName = "categoryFromId")
+    @Mapping(target = "location", source = "location", qualifiedByName = "locationFromDto")
     void updateEntityFromAdminRequest(UpdateEventAdminRequest request, @MappingTarget Event event);
 
     @Named("categoryFromId")
     default Category categoryFromId(Long categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
         return Category.builder().id(categoryId).build();
     }
 
     @Named("userFromId")
     default User userFromId(Long userId) {
+        if (userId == null) {
+            return null;
+        }
         return User.builder().id(userId).build();
     }
 
     @Named("locationFromDto")
     default Location locationFromDto(ru.practicum.main.dto.location.LocationDto locationDto) {
+        if (locationDto == null) {
+            return null;
+        }
         return Location.builder()
                 .lat(locationDto.getLat())
                 .lon(locationDto.getLon())
