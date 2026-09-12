@@ -88,9 +88,11 @@ public class PublicEventServiceImpl implements PublicEventService {
         Event event = eventRepository.findByIdAndState(id, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + id + " was not found"));
 
+        String eventUri = "/events/" + id;
+
         statsClient.saveHit(ru.practicum.main.stats.dto.EndpointHit.builder()
                 .app("ewm-main-service")
-                .uri(request.getRequestURI())
+                .uri(eventUri)
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())
                 .build());
@@ -98,9 +100,9 @@ public class PublicEventServiceImpl implements PublicEventService {
         EventFullDto dto = eventMapper.toFullDto(event);
 
         try {
-            List<String> uris = List.of("/events/" + id);
-            LocalDateTime start = LocalDateTime.now().minusYears(10);
-            LocalDateTime end = LocalDateTime.now().plusYears(10);
+            List<String> uris = List.of(eventUri);
+            LocalDateTime start = event.getCreatedOn() != null ? event.getCreatedOn().minusDays(1) : LocalDateTime.now().minusYears(10);
+            LocalDateTime end = LocalDateTime.now().plusDays(1);
             var statsResponse = statsClient.getStats(start, end, uris, true);
             if (statsResponse != null && statsResponse.getBody() != null && statsResponse.getBody().length > 0) {
                 dto.setViews(statsResponse.getBody()[0].getHits());
@@ -128,7 +130,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                     .collect(Collectors.toList());
 
             LocalDateTime start = LocalDateTime.now().minusYears(10);
-            LocalDateTime end = LocalDateTime.now().plusYears(10);
+            LocalDateTime end = LocalDateTime.now().plusHours(1);
 
             var statsResponse = statsClient.getStats(start, end, uris, true);
             if (statsResponse.getBody() != null) {
