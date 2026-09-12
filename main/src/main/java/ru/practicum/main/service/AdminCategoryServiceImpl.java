@@ -38,7 +38,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     @Override
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("категория с ид=" + catId + "не найденп"));
+                .orElseThrow(() -> new NotFoundException("категория с ид=" + catId + "не найденпa"));
         if (!category.getName().equals(categoryDto.getName()) && categoryRepository.existsByName(categoryDto.getName())) {
             throw new ConflictException("категория с названием " + categoryDto.getName() + " уже существует");
         }
