@@ -101,11 +101,18 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         try {
             List<String> uris = List.of(eventUri);
-            LocalDateTime start = event.getCreatedOn() != null ? event.getCreatedOn().minusDays(1) : LocalDateTime.now().minusYears(10);
+            LocalDateTime start = LocalDateTime.now().minusYears(10);
             LocalDateTime end = LocalDateTime.now().plusDays(1);
+
             var statsResponse = statsClient.getStats(start, end, uris, true);
-            if (statsResponse != null && statsResponse.getBody() != null && statsResponse.getBody().length > 0) {
-                dto.setViews(statsResponse.getBody()[0].getHits());
+
+            if (statsResponse != null && statsResponse.hasBody() && statsResponse.getBody().length > 0) {
+                long hits = java.util.Arrays.stream(statsResponse.getBody())
+                        .filter(stat -> stat.getUri().equals(eventUri))
+                        .mapToLong(ViewStats::getHits)
+                        .findFirst()
+                        .orElse(0L);
+                dto.setViews(hits);
             } else {
                 dto.setViews(0L);
 
@@ -132,7 +139,7 @@ public class PublicEventServiceImpl implements PublicEventService {
             LocalDateTime start = LocalDateTime.now().minusYears(10);
             LocalDateTime end = LocalDateTime.now().plusHours(1);
 
-            var statsResponse = statsClient.getStats(start, end, uris, true);
+            var statsResponse = statsClient.getStats(start, end, uris, false);
             if (statsResponse.getBody() != null) {
                 java.util.Map<String, Long> viewsMap = new java.util.HashMap<>();
                 for (ViewStats stat : statsResponse.getBody()) {
