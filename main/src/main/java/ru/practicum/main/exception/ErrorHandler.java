@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -101,6 +102,18 @@ public class ErrorHandler {
         return Map.of(
                 "status", "BAD_REQUEST",
                 "reason", "Incorrectly made request.",
+                "message", e.getMessage(),
+                "timestamp", LocalDateTime.now().format(FORMATTER)
+        );
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, Object> handleNoResourceFound(NoResourceFoundException e) {
+        log.error("404 No resource found: {}", e.getMessage());
+        return Map.of(
+                "status", "NOT_FOUND",
+                "reason", "The required object was not found.",
                 "message", e.getMessage(),
                 "timestamp", LocalDateTime.now().format(FORMATTER)
         );
