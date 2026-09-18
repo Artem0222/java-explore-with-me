@@ -1,2 +1,6 @@
 # java-explore-with-me
 Template repository for ExploreWithMe project.
+
+# Ссылка на репозиторий - https://github.com/Artem0222/java-explore-with-me/tree/feature_comments
+
+# Ссылка на пул-реквест - https://github.com/Artem0222/java-explore-with-me/pull/4
